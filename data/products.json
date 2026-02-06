@@ -1,0 +1,49 @@
+[
+  {
+    "id": "p-1",
+    "name": "پیرهن زنانه نخی",
+    "category": "زنانه",
+    "price": 350000,
+    "stock": 0,
+    "description": "پیراهن سبک و خنک مناسب تابستان",
+    "imagePath": "C:\\Users\\asus\\Pictures\\Screenshots\\Screenshot 2025-02-07 132209.png",
+    "rating": 4.5,
+    "ratingCount": 10,
+    "availableForClient": true
+  },
+  {
+    "id": "p-2",
+    "name": "تیشرت کلاسیک مردانه",
+    "category": "مردانه",
+    "price": 420000,
+    "stock": 6,
+    "description": "جین با کیفیت و فیت استاندارد",
+    "imagePath": "C:\\Users\\Lenovo\\Downloads\\ap-final-project\\data\\images\\shirt1.jpg",
+    "rating": 4.2,
+    "ratingCount": 8,
+    "availableForClient": true
+  },
+  {
+    "id": "p-7",
+    "name": "تیشرت مردانه کتان",
+    "category": "مردونه",
+    "price": 180000,
+    "stock": 22,
+    "description": "تی‌شرت راحت",
+    "imagePath": "C:\\Users\\asus\\Pictures\\Screenshots\\Screenshot 2025-02-10 184806.png",
+    "rating": 4.1,
+    "ratingCount": 9,
+    "availableForClient": true
+  },
+  {
+    "name": "بیت رهبری",
+    "category": "سیاسی",
+    "price": 57,
+    "stock": 55,
+    "description": "موز\t",
+    "imagePath": "C:\\Users\\asus\\Pictures\\Screenshots\\Screenshot 2025-02-08 214202.png",
+    "rating": 0.0,
+    "ratingCount": 0,
+    "availableForClient": true
+  }
+]
