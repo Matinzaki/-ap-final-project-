@@ -1,4 +1,3 @@
-سلاممم
 # ap-final-project
 Shopping Mall - Java Swing demo
 
