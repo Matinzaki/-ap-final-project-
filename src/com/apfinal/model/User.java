@@ -1,10 +1,11 @@
 package com.apfinal.model;
 
 /**
- * - هم ادمین و هم مشتری با این کلاس نمایش داده می‌شوند.
+ * - هم ادمین و هم مشتری با این کلاس نمایش داده می شه.
  * -
  */
 public class User {
+    // فیلدهای کلاس، اطلاعات کاربر
     private String username;
     private String password;
     private Role role;
@@ -12,7 +13,6 @@ public class User {
 
     public User() {}
 
-    // سازنده کامل (مورد استفاده در PersistenceService و AuthService)
     public User(String username, String password, Role role, long balance) {
         this.username = username;
         this.password = password;
