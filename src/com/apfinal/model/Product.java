@@ -3,9 +3,10 @@ package com.apfinal.model;
 import java.util.UUID;
 
 /**
- * مدل محصول: نام، دسته، قیمت (ریال)، استوک، توضیح، مسیر تصویر، امتیاز و تعداد آرا
+ * مدل محصول: نام، دسته، قیمت (ریال)، استوک، توضیح، مسیر تصویر، امتیاز
  */
 public class Product {
+    // فیلدهای کلاس - اطلاعات محصول
     private String id;
     private String name;
     private String category;
@@ -19,6 +20,7 @@ public class Product {
 
     public Product() {}
 
+    //  پارامترهای اصلی
     public Product(String name, String category, long price, int stock, String description, String imagePath, boolean availableForClient) {
         this.id = UUID.randomUUID().toString();
         this.name = name;
@@ -32,7 +34,6 @@ public class Product {
         this.ratingCount = 0;
     }
 
-    // getter / setter
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -63,6 +64,7 @@ public class Product {
     public boolean isAvailableForClient() { return availableForClient; }
     public void setAvailableForClient(boolean availableForClient) { this.availableForClient = availableForClient; }
 
+    // متد اضافه کردن امتیاز جدید
     public void addRating(double r) {
         if (r < 0) r = 0;
         double total = rating * ratingCount;
@@ -71,6 +73,7 @@ public class Product {
         rating = total / ratingCount;
     }
 
+    // متد نمایش محصول به صورت متنی
     @Override
     public String toString() {
         return name + " | " + category + " | " + price + " ریال | stock: " + stock;
