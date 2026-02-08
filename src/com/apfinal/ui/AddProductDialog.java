@@ -20,23 +20,29 @@ public class AddProductDialog extends JDialog {
     private JCheckBox availBox = new JCheckBox("Available for clients", true);
     private JTextField imagePathField = new JTextField(20);
     private File selectedImageFile = null;
-
     public AddProductDialog(JFrame owner, CatalogService cs, PersistenceService ps) {
         super(owner, "Add Product", true);
         setLayout(new BorderLayout());
+        
+        // ایجاد پنل  با چیدمان شبکه‌ ای
         JPanel form = new JPanel(new GridLayout(0,2,6,6));
         form.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        
         form.add(new JLabel("ID (leave empty to auto)")); form.add(idField);
         form.add(new JLabel("Name")); form.add(nameField);
         form.add(new JLabel("Category")); form.add(categoryField);
         form.add(new JLabel("Price (Rial)")); form.add(priceField);
         form.add(new JLabel("Quantity")); form.add(qtyField);
         form.add(new JLabel("")); form.add(availBox);
+        
+        // بخش انتخاب تصویر
         form.add(new JLabel("Image"));
         JPanel imRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0,0));
         imagePathField.setEditable(false);
         imRow.add(imagePathField);
         JButton choose = new JButton("Choose...");
+        
+        //  انتخاب تصویر
         choose.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
             int r = fc.showOpenDialog(this);
@@ -51,14 +57,17 @@ public class AddProductDialog extends JDialog {
 
         add(form, BorderLayout.CENTER);
 
+        // درست کردن دکمه‌های سیو و کنسل
         JPanel buttons = new JPanel();
         JButton save = new JButton("Save");
         JButton cancel = new JButton("Cancel");
         buttons.add(save); buttons.add(cancel);
         add(buttons, BorderLayout.SOUTH);
 
+        //  دکمه ی سیو
         save.addActionListener(e -> {
             try {
+                // خواندن داده
                 String id = idField.getText().trim();
                 if (id.isEmpty()) id = UUID.randomUUID().toString();
                 String name = nameField.getText().trim();
@@ -67,6 +76,7 @@ public class AddProductDialog extends JDialog {
                 int qty = Integer.parseInt(qtyField.getText().trim());
                 boolean avail = availBox.isSelected();
 
+                // پردازش تصویر
                 String imageRelPath = null;
                 if (selectedImageFile != null) {
                     File imagesDir = new File("data/images");
@@ -79,10 +89,10 @@ public class AddProductDialog extends JDialog {
                     imageRelPath = "data/images/" + destName;
                 }
 
-                // سازنده‌ی واقعی Product: (id, name, long price, int stock, String description, String imagePath, boolean available)
+                // ایجاد محصول و ذخیره آن
                 Product p = new Product(id, name, price, qty, "", imageRelPath == null ? "" : imageRelPath, avail);
                 p.setCategory(cat);
-                cs.addProduct(p); // افزود و ذخیره کردن
+                cs.addProduct(p); // افزودن و ذخیره کردن
                 JOptionPane.showMessageDialog(this, "Product added.");
                 dispose();
             } catch (NumberFormatException ex) {
@@ -92,8 +102,10 @@ public class AddProductDialog extends JDialog {
             }
         });
 
+        //  دکمه ی کنسل
         cancel.addActionListener(e -> dispose());
 
+        // تنظیمات پنجره
         pack();
         setLocationRelativeTo(owner);
         setVisible(true);
