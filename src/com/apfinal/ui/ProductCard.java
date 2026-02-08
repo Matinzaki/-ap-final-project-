@@ -9,13 +9,7 @@ import com.apfinal.util.ImageUtils;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * یک کارت محصول برای نمایش اطلاعات پایگاه محصول در ShopPanel.
- * - عکس، عنوان، دسته‌بندی، قیمت، استوک نمایش داده میشه
- * - دکمه‌های Add/Remove برای مدیریت سبد
- *
- * توضیح هدف: این کلاس نمایشیه و منطق اضافه/حذف رو از CartService صدا میزنه.
- */
+
 public class ProductCard extends JPanel {
     private Product product;
     private CatalogService catalogService;
@@ -44,11 +38,9 @@ public class ProductCard extends JPanel {
         // اطلاعات محصول
         JPanel info = new JPanel(new GridLayout(0,2));
         info.add(new JLabel("<html><b>Title:</b> " + product.getName() + "</html>"));
-        // اضافه شدن دسته‌بندی (Category) مطابق درخواست
         info.add(new JLabel("<html><b>Category:</b> " + (product.getCategory() == null ? "-" : product.getCategory()) + "</html>"));
         info.add(new JLabel("<html><b>Price:</b> " + product.getPrice() + " ریال</html>"));
         info.add(new JLabel("<html><b>Stock:</b> " + product.getStock() + "</html>"));
-        // ریتینگ و کانت هنوز نمایش داده می‌شن در کارت مشتری (درخواست حذف فقط برای پنل ادمین بود)
         info.add(new JLabel("Average rating: " + String.format("%.1f", product.getRating())));
         info.add(new JLabel("Rating count: " + product.getRatingCount()));
         info.add(new JLabel("Available: " + (product.isAvailableForClient() ? "Yes" : "No")));
