@@ -8,20 +8,22 @@ import java.util.Map;
 
 /**
  * سرویس احراز هویت: signIn / signUp
- * - ادمین‌ها از قبل در لیست مشخص‌اند (هاردکد)
+ * - ادمین‌ها از قبل در لیست مشخصن
  * - ثبت‌نام فقط برای CUSTOMER انجام می‌شود
  */
 public class AuthService {
     private final PersistenceService persistence;
     private Map<String, User> users;
 
+    // لیست ادمین از قبل تعریف شده
     private static final String[] ADMIN_USERNAMES = {"admin"};
 
+    //  بارگذاری کاربران و تنظیم نقش‌ها
     public AuthService(PersistenceService persistence) {
         this.persistence = persistence;
         this.users = persistence.loadUsers();
 
-        // تضمین نقش ADMIN برای کاربران از پیش تعریف شده
+        // فقط ادمین از قبل تعریف شده مابقی افراد به عنوان مشتری ثبت نام و ورود می کنن
         for (String adminUsername : ADMIN_USERNAMES) {
             User u = users.get(adminUsername);
             if (u != null) u.setRole(Role.ADMIN);
@@ -29,6 +31,7 @@ public class AuthService {
         persistence.saveUsers(users.values());
     }
 
+    // متد ورود به سیستم
     public User signIn(String username, String password) {
         User u = users.get(username);
         if (u != null && u.getPassword().equals(password)) {
@@ -42,7 +45,7 @@ public class AuthService {
         return null;
     }
 
-    // ثبت‌نام کاربران جدید به عنوان CUSTOMER
+    // متد ثبت‌نام کاربر جدید
     public boolean signUp(String username, String password) {
         if (users.containsKey(username)) return false;
         User u = new User(username, password, Role.CUSTOMER, 2000000L);
@@ -51,6 +54,7 @@ public class AuthService {
         return true;
     }
 
+    // متدهای کمکی برای دسترسی به کاربران
     public Map<String, User> getAllUsers() { return users; }
     public void saveUsers() { persistence.saveUsers(users.values()); }
 }
