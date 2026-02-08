@@ -18,16 +18,6 @@ import java.util.Comparator;
 
 /*
  * ShopPanel: پنل اصلی مشتری
- *
- * - نمایش فهرست محصولات (وسط)
- * - نوار سمت چپ حاوی اطلاعات کاربر: نوع یوزر، welcome، username، balance
- *    و دکمه‌های: Cart، Profile، Logout
- * - جستجو و سورت (بالای وسط) — حالا گزینه‌های سورت فارسی اضافه شدند
- *
- * تغییرات (طبق درخواست):
- *  - به سِرت‌بای گزینه‌های فارسی "نام (الف تا ی)" و "دسته‌بندی (الف تا ی)" اضافه شد
- *  - مرتب‌سازی فارسی با Collator و Locale("fa") انجام می‌شه
- *  - کارت محصول (نمایش) شامل Category هم هست
  */
 public class ShopPanel extends JPanel implements DataChangeListener {
 
@@ -46,7 +36,7 @@ public class ShopPanel extends JPanel implements DataChangeListener {
     private JTextField tfSearch;
     private JComboBox<String> cbSort;
 
-    // لیبل‌های فارسی سورت
+    //  سورت فارسی
     private static final String SORT_DEFAULT = "پیش‌فرض";
     private static final String SORT_PRICE = "قیمت";
     private static final String SORT_NAME_FA = "نام (الف تا ی)";
@@ -60,7 +50,6 @@ public class ShopPanel extends JPanel implements DataChangeListener {
         this.catalogService = session.getCatalogService();
         this.cartService = session.getCartService();
 
-        // عضو شدن به عنوان listener برای تغییر داده‌ها (وقتی user یا کاتالوگ تغییر کنه)
         this.session.addListener(this);
         this.catalogService.addListener(this); // وقتی محصولات تغییر کردند هم آپدیت می‌شه
 
@@ -72,7 +61,6 @@ public class ShopPanel extends JPanel implements DataChangeListener {
 
     // ساختار اصلی UI
     private void initUI() {
-        // سمت چپ: اطلاعات کاربر + دکمه‌ها
         JPanel left = new JPanel();
         left.setPreferredSize(new Dimension(260, 0));
         left.setLayout(new GridBagLayout());
@@ -156,7 +144,7 @@ public class ShopPanel extends JPanel implements DataChangeListener {
             JOptionPane.showMessageDialog(this, msg, "Profile", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        // دکمه Log out — بخش امتیازی
+        // دکمه Log out 
         btnLogout.addActionListener(e -> {
             int ans = JOptionPane.showConfirmDialog(this, "آیا می‌خواهید خارج شوید؟", "Confirm Logout", JOptionPane.YES_NO_OPTION);
             if (ans == JOptionPane.YES_OPTION) {
