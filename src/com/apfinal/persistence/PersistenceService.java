@@ -24,6 +24,7 @@ public class PersistenceService {
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+    //  ایجاد دایرکتوری‌
     public PersistenceService() {
         try {
             Files.createDirectories(Path.of(DATA_DIR));
@@ -33,6 +34,7 @@ public class PersistenceService {
         }
     }
 
+    // ریختن کاتالوگ محصولات از فایل JSON
     public Catalog loadCatalog() {
         Catalog c = new Catalog();
         File f = new File(PRODUCTS_FILE);
@@ -47,6 +49,7 @@ public class PersistenceService {
         return c;
     }
 
+    // ذخیره کاتالوگ محصولات در فایل JSON
     public void saveCatalog(Catalog catalog) {
         try (Writer w = new FileWriter(PRODUCTS_FILE)) {
             gson.toJson(catalog.getProducts(), w);
@@ -55,6 +58,7 @@ public class PersistenceService {
         }
     }
 
+    // ریختن کاربران از فایل JSON
     public Map<String, User> loadUsers() {
         File f = new File(USERS_FILE);
         if (!f.exists()) return defaultUsers();
@@ -70,6 +74,7 @@ public class PersistenceService {
         }
     }
 
+    // ذخیره کاربران در فایل JSON
     public void saveUsers(Collection<User> users) {
         try (Writer w = new FileWriter(USERS_FILE)) {
             gson.toJson(users, w);
@@ -78,6 +83,7 @@ public class PersistenceService {
         }
     }
 
+    // ایجاد کاربران پیش‌فرض
     private Map<String, User> defaultUsers() {
         Map<String, User> map = new HashMap<>();
         map.put("admin", new User("admin", "admin", com.apfinal.model.Role.ADMIN, 0L));
@@ -85,5 +91,6 @@ public class PersistenceService {
         return map;
     }
 
+    // دریافت مسیر تصاویر
     public String getImagesDir() { return IMAGES_DIR; }
 }
