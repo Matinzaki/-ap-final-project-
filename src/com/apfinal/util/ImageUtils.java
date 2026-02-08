@@ -9,7 +9,7 @@ import java.nio.file.Path;
 
 /**
  * متدهای کمکی برای تصاویر:
- * - loadImage: لود و مقیاس‌دهی
+ * - loadImage: لود 
  * - copyToImagesDir: کپی تصویر به data/images و بازگرداندن مسیر جدید
  */
 public class ImageUtils {
