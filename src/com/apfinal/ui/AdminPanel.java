@@ -17,14 +17,6 @@ import javax.swing.DefaultListModel;
 
 /**
  * پنل مدیریت:
- * - نمایش لیست محصولات با دکمه‌های Modify/Delete
- * - Add Product با امکان انتخاب تصویر (کپی به data/images)
- *
- * تغییرات (مخصوص درخواست تو):
- *  - نمایش Rating از لیست حذف شد (دیگه نمایش داده نمیشه)
- *  - وقتی Delete رو تایید می‌کنی محصول واقعاً حذف می‌شه و UI فوراً رفرش می‌شه
- *
- * سایر رفتارها بدون تغییر باقی موندن.
  */
 public class AdminPanel extends JPanel implements DataChangeListener {
     private MainFrame parent;
@@ -32,42 +24,44 @@ public class AdminPanel extends JPanel implements DataChangeListener {
     private CatalogService catalogService;
     private JPanel listPanel;
 
+    //  پنل ادمین
     public AdminPanel(MainFrame parent, SessionManager session) {
         this.parent = parent;
         this.session = session;
         this.catalogService = session.getCatalogService();
 
-        // ثبت به عنوان listener
         catalogService.addListener(this);
 
         build();
         refreshList();
     }
 
+    // ساختار اصلی رابط کاربری
     private void build() {
         setLayout(new BorderLayout());
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton btnAdd = new JButton("Add Product");
-        JButton btnLogout = new JButton("Log out");
-        JButton btnSearch = new JButton("Search"); // دکمهٔ سرچ (اضافه‌شده)
+        JButton btnLogout = new JButton("خروج");
+        JButton btnSearch = new JButton("Search"); // دکمهٔ سرچ (امتیازی)
         top.add(btnAdd);
         top.add(btnLogout);
         top.add(btnSearch);
         add(top, BorderLayout.NORTH);
 
+        // پنل نمایش لیست محصولات
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         add(new JScrollPane(listPanel), BorderLayout.CENTER);
 
+        // رویدادهای دکمه‌ها
         btnAdd.addActionListener(e -> openAddDialog());
         btnLogout.addActionListener(e -> parent.showPanel("login"));
 
-        // ===== بخش امتیازی: باز کردن دیالوگ جستجو برای محصولات =====
+        // بخش امتیازی: باز کردن دیالوگ جستجو برای محصولات
         btnSearch.addActionListener(e -> showProductSearchDialog());
     }
 
-    /* بخش امتیازی */
-    // متد نمایش دیالوگ سرچ برای ادمین — فقط UI، از catalogService استفاده می‌کنه
+    /* بخش امتیازی - دیالوگ جستجوی محصولات */
     private void showProductSearchDialog() {
         JDialog dlg = new JDialog(SwingUtilities.getWindowAncestor(this), "Search Products", Dialog.ModalityType.APPLICATION_MODAL);
         dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -75,7 +69,6 @@ public class AdminPanel extends JPanel implements DataChangeListener {
         dlg.setLocationRelativeTo(this);
 
         JPanel root = new JPanel(new BorderLayout(8,8));
-        // بالای دیالوگ: فیلد سرچ + دکمه
         JPanel top = new JPanel(new BorderLayout(6,6));
         JTextField tf = new JTextField();
         JButton bSearch = new JButton("Search");
@@ -83,12 +76,10 @@ public class AdminPanel extends JPanel implements DataChangeListener {
         top.add(tf, BorderLayout.CENTER);
         top.add(bSearch, BorderLayout.EAST);
 
-        // مرکز: لیست نتایج
         DefaultListModel<String> listModel = new DefaultListModel<>();
         JList<String> resultList = new JList<>(listModel);
         JScrollPane sc = new JScrollPane(resultList);
 
-        // پایین: دکمهٔ Close
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton bClose = new JButton("Close");
         bottom.add(bClose);
@@ -98,12 +89,12 @@ public class AdminPanel extends JPanel implements DataChangeListener {
         root.add(bottom, BorderLayout.SOUTH);
         dlg.setContentPane(root);
 
-        // فانکشنِ فیلتر و پر کردن لیست — از catalogService استفاده می‌کنیم
+        // تابع جستجو
         Runnable doSearch = () -> {
             String q = tf.getText().trim().toLowerCase();
             listModel.clear();
             if (q.isEmpty()) return;
-            List<Product> allProducts = catalogService.getAll(); // توجه: متد getAll() در پروژه‌ی تو استفاده شده
+            List<Product> allProducts = catalogService.getAll();
             List<Product> matches = allProducts.stream()
                 .filter(p -> {
                     String name = p.getName() == null ? "" : p.getName().toLowerCase();
@@ -122,10 +113,11 @@ public class AdminPanel extends JPanel implements DataChangeListener {
             }
         };
 
+        // رویدادهای جستجو
         bSearch.addActionListener(ev -> doSearch.run());
         tf.addActionListener(ev -> doSearch.run());
 
-        // دابل کلیک جهت نمایش خلاصهٔ محصول
+        // دابل‌کلیک برای نمایش جزئیات
         resultList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent me) {
@@ -134,7 +126,6 @@ public class AdminPanel extends JPanel implements DataChangeListener {
                     if (idx < 0) return;
                     String sel = listModel.getElementAt(idx);
                     if (sel.equals("هیچ محصولی پیدا نشد.")) return;
-                    // فقط نمایش خلاصهٔ همان خط لیست — اگر خواستی می‌تونم پنل ویرایش محصول هم باز بشه
                     JOptionPane.showMessageDialog(dlg, sel, "Product details", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
@@ -144,22 +135,24 @@ public class AdminPanel extends JPanel implements DataChangeListener {
         dlg.setVisible(true);
     }
 
+    // متد واکنش به تغییرات داده
     @Override
     public void onDataChanged() {
         SwingUtilities.invokeLater(this::refreshList);
     }
 
+    // رفرش لیست محصولات
     public void refreshList() {
         listPanel.removeAll();
         for (Product p : catalogService.getAll()) {
+            // ایجاد سطر برای هر محصول
             JPanel row = new JPanel(new BorderLayout());
             row.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
-            // تصویر محصول (اگر موجود باشه)
+            // نمایش تصویر محصول اگر وجود داشته باشد
             if (p.getImagePath() != null && !p.getImagePath().isEmpty()) {
                 File img = new File(p.getImagePath());
                 if (img.exists()) {
-                    // ======= این خط اصلاح شده: استفاده از loadImage که در پروژه موجوده =======
                     ImageIcon ic = ImageUtils.loadImage(img.getAbsolutePath(), 100, 100);
                     if (ic != null) {
                         JLabel lbl = new JLabel(ic);
@@ -168,16 +161,16 @@ public class AdminPanel extends JPanel implements DataChangeListener {
                 }
             }
 
-            // اطلاعات متنی محصول و دکمه‌ها
+            // پنل اطلاعات محصول
             JPanel info = new JPanel();
             info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
             info.add(new JLabel("Title: " + p.getName()));
             info.add(new JLabel("Category: " + p.getCategory()));
             info.add(new JLabel("Price: " + p.getPrice()));
-            // Rating حذف شده تا در پنل ادمین نمایش داده نشه (طبق درخواست)
             info.add(new JLabel("Stock: " + p.getStock()));
             info.add(new JLabel("Available for client: " + p.isAvailableForClient()));
 
+            // پنل دکمه‌های عملیاتی
             JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             JButton btnModify = new JButton("Modify");
             JButton btnDelete = new JButton("Delete");
@@ -187,19 +180,50 @@ public class AdminPanel extends JPanel implements DataChangeListener {
             row.add(info, BorderLayout.CENTER);
             row.add(actions, BorderLayout.EAST);
 
-            // لیسنرها
+            // رویداد ویرایش محصول
             btnModify.addActionListener(e -> openEditDialog(p));
+            
+            // رویداد حذف محصول با تأیید و منطق fallback
             btnDelete.addActionListener(e -> {
-                int ok = JOptionPane.showConfirmDialog(this, "Are you sure to delete?", "Confirm", JOptionPane.YES_NO_OPTION);
+                int ok = JOptionPane.showConfirmDialog(this, "آیا از حذف این محصول مطمئن هستید؟", "تأیید حذف", JOptionPane.YES_NO_OPTION);
                 if (ok == JOptionPane.YES_OPTION) {
-                    // حذف واقعی محصول از سرویس کاتالوگ
-                    catalogService.removeProduct(p.getId());
+                    boolean removed = false;
+                    try {
+                        // اگر id موجوده، از متد رسمی استفاده کن
+                        if (p.getId() != null && !p.getId().trim().isEmpty()) {
+                            catalogService.removeProduct(p.getId());
+                            removed = true;
+                        } else {
+                            Product toRemove = null;
+                            for (Product q : catalogService.getAll()) {
+                                boolean same =
+                                        safeEquals(q.getName(), p.getName()) &&
+                                        q.getPrice() == p.getPrice() &&
+                                        q.getStock() == p.getStock() &&
+                                        safeEquals(q.getImagePath(), p.getImagePath());
+                                if (same) { toRemove = q; break; }
+                            }
+                            if (toRemove != null) {
+                                // اگر id داشتند، از removeProduct استفاده کن، در غیر این صورت مستقیم از لیست حذف کن و save
+                                if (toRemove.getId() != null && !toRemove.getId().trim().isEmpty()) {
+                                    catalogService.removeProduct(toRemove.getId());
+                                } else {
+                                    catalogService.getAll().remove(toRemove);
+                                    catalogService.save();
+                                }
+                                removed = true;
+                            }
+                        }
+                    } catch (Exception ex) {
+                        removed = false;
+                    }
 
-                    // فوراً رفرش لیست (تا کاربر تفاوت را ببیند)
-                    refreshList();
-
-                    // پیام موفقیت
-                    JOptionPane.showMessageDialog(this, "محصول با موفقیت حذف شد.");
+                    if (removed) {
+                        refreshList();
+                        JOptionPane.showMessageDialog(this, "محصول حذف شد.");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "حذف انجام نشد.");
+                    }
                 }
             });
 
@@ -210,7 +234,16 @@ public class AdminPanel extends JPanel implements DataChangeListener {
         listPanel.repaint();
     }
 
+    // متد کمکی برای مقایسه رشته‌ها
+    private boolean safeEquals(String a, String b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        return a.equals(b);
+    }
+
+    // دیالوگ اضافه کردن محصول جدید
     private void openAddDialog() {
+        // کد موجود باز گذاشته شد — همان UI قبلی (اضافی نکردم)
         JDialog d = new JDialog(SwingUtilities.getWindowAncestor(this), "Please enter products details", Dialog.ModalityType.APPLICATION_MODAL);
         d.setSize(500, 500);
         d.setLayout(new GridLayout(0,2,6,6));
@@ -259,7 +292,7 @@ public class AdminPanel extends JPanel implements DataChangeListener {
                 p.setDescription(taDesc.getText());
                 p.setImagePath(tfImagePath.getText().trim());
                 p.setAvailableForClient(cbAvailable.isSelected());
-                catalogService.addProduct(p);
+                catalogService.addProduct(p); // حالا CatalogService تضمین می‌کند که آی دی تولید می‌شود اگر لازم باشد
                 JOptionPane.showMessageDialog(d, "Product added!");
                 d.dispose();
             } catch (Exception ex) {
@@ -272,7 +305,9 @@ public class AdminPanel extends JPanel implements DataChangeListener {
         d.setVisible(true);
     }
 
+    // دیالوگ ویرایش محصول موجود
     private void openEditDialog(Product p) {
+        // از دیالوگ قدیمی استفاده می‌کنیم (همان UI موجود)
         JDialog d = new JDialog(SwingUtilities.getWindowAncestor(this), "Edit product", Dialog.ModalityType.APPLICATION_MODAL);
         d.setSize(500, 500);
         d.setLayout(new GridLayout(0,2,6,6));
@@ -320,7 +355,42 @@ public class AdminPanel extends JPanel implements DataChangeListener {
                 p.setDescription(taDesc.getText());
                 p.setImagePath(tfImagePath.getText().trim());
                 p.setAvailableForClient(cbAvailable.isSelected());
-                catalogService.updateProduct(p);
+
+                // اگر محصول در کاتالوگ با آی دی شناخته میشه، updateProduct کافیست.
+                // اگر آی دی نداشت یا با آی دی نتونست پیدا کنه (محصول تازه اضافه‌شده از طریق دیالوگ بدون آی دی)،
+                // با فراخوانی سیو() تغییرات را ذخیره می‌کنیم.
+                if (catalogService.findById(p.getId()) != null) {
+                    catalogService.updateProduct(p);
+                } else {
+                    // فقط مطمئن شو که آیتم موجود در لیست کاتالوگ همان شیء عه و سپس سیو کن
+                    // (به این ترتیب محصول‌های بدون id هم ویرایش می‌شن)
+                    List<Product> list = catalogService.getAll();
+                    boolean found = false;
+                    for (Product q : list) {
+                        if (q == p) { // همون شی در لیست
+                            catalogService.save();
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        // تلاش برای پیدا کردن براساس مشخصات 
+                        String oid = p.getId();
+                        for (int i = 0; i < list.size(); i++) {
+                            Product q = list.get(i);
+                            if (q.getName().equals(p.getName()) && q.getPrice() == p.getPrice() && q.getStock() == p.getStock()) {
+                                list.set(i, p);
+                                catalogService.save();
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            catalogService.updateProduct(p);
+                        }
+                    }
+                }
+
                 JOptionPane.showMessageDialog(d, "ذخیره شد!");
                 d.dispose();
             } catch (Exception ex) {
