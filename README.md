@@ -1,4 +1,4 @@
-# ap-final-project — Mall Shopping (Java Swing)
+# ap-final-project — Mall Shopping 
 
 ## تیم
 - Paria Bagheri Behrouzian — 40312013
