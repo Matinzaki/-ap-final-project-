@@ -1,7 +1,7 @@
 package com.apfinal.session;
 
 /**
- * اینترفیس ساده برای اطلاع‌رسانی تغییرات داده به UI
+ * یه مکانیسم ساده برای اطلاع رسانی تغییرات داده ها به بخش های دیگه ی برنامه درحقیقت یه رابط یا همون اینترفیس هستش
  */
 public interface DataChangeListener {
     void onDataChanged();
