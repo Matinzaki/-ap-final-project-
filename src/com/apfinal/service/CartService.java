@@ -7,21 +7,13 @@ import com.apfinal.model.User;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * سرویس سبد خرید: نگهداری سبد session-local و عملیات checkout
- * متدهایی که UI انتظار داره:
- * - addToCart(Product, int)
- * - removeFromCart(String, int)
- * - setItem(String,int)
- * - total(Map<String,Product>)
- * - checkout(User, Map<String,Product>)
- * - resolveItems(Map<String,Product>)
- */
+
 public class CartService {
     private final Cart cart = new Cart();
 
     public Cart getCart() { return cart; }
 
+    // افزودن محصول به سبد خرید با بررسی شرایط
     public boolean addToCart(Product p, int qty) {
         if (p == null || qty <= 0) return false;
         if (!p.isAvailableForClient()) return false;
@@ -30,9 +22,12 @@ public class CartService {
         return true;
     }
 
+    // حذف محصول از سبد خرید
     public void removeFromCart(String productId, int qty) { cart.removeItem(productId, qty); }
+    // تنظیم تعداد یک محصول در سبد خرید
     public void setItem(String productId, int qty) { cart.setItem(productId, qty); }
 
+    // محاسبه قیمت کل سبد خرید
     public long total(Map<String, Product> productMap) {
         long total = 0L;
         for (Map.Entry<String, Integer> e : cart.getItems().entrySet()) {
@@ -42,16 +37,19 @@ public class CartService {
         return total;
     }
 
+    // پرداخت نهایی و تکمیل سفارش
     public boolean checkout(User user, Map<String, Product> productMap) {
         if (user == null) return false;
         long total = total(productMap);
         if (user.getBalance() < total) return false;
 
+        // بررسی موجودی کافی برای تمام محصولات
         for (Map.Entry<String, Integer> e : cart.getItems().entrySet()) {
             Product p = productMap.get(e.getKey());
             if (p == null || p.getStock() < e.getValue()) return false;
         }
 
+        // کاهش موجودی محصولات و کم کردن مبلغ از پول کاربر
         for (Map.Entry<String, Integer> e : cart.getItems().entrySet()) {
             Product p = productMap.get(e.getKey());
             p.setStock(p.getStock() - e.getValue());
@@ -61,6 +59,7 @@ public class CartService {
         return true;
     }
 
+    // تبدیل داده ی محصولات به اشیا
     public Map<Product, Integer> resolveItems(Map<String, Product> productMap) {
         Map<Product, Integer> out = new HashMap<>();
         for (Map.Entry<String, Integer> e : cart.getItems().entrySet()) {
